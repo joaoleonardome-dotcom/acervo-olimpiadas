@@ -1025,7 +1025,7 @@ function gerarHtmlPublico(){
     else { pubCfg.apiKey = cfg.apiKey; pubCfg.binId = cfg.binId; }
     pubCfg.nome = cfg.nome || 'Acervo Olimpico';
     var newHtml = html.replace(
-      'var PUBLIC_CFG = null;',
+      'var PUBLIC_CFG = {"provider":"sheets","sheetsUrl":"https://script.google.com/macros/s/AKfycbyypvXeOyn1okAa2oQe0BtJGzbOCQUnR_YuEdZzapiLjGyXYREvJWf39rhOIXhNJxB9OA/exec","nome":"Acervo de Olimpíadas - Prof. João Leonardo Muniz"};',
       'var PUBLIC_CFG = '+JSON.stringify(pubCfg)+';'
     );
     var blob = new Blob([newHtml], {type:'text/html'});
@@ -1050,42 +1050,26 @@ function toast(msg,type){
 }
 
 // ── BOOT ─────────────────────────────────────────────────────
-// Config publica embutida no HTML pelo admin
-var PUBLIC_CFG = null;
+// Config publica embutida no HTML (preenchida pelo admin via configuracoes)
+var PUBLIC_CFG = null; // sera substituido pelo admin: {provider,sheetsUrl ou apiKey+binId}
 
 loadCfg();
-
-var isAdminUrl = window.location.search.indexOf('admin') >= 0;
-
-if((cfg.apiKey||cfg.sheetsUrl) && cfg.passHash) {
-  // Admin ja configurado neste navegador - entra normal
+if((cfg.apiKey||cfg.sheetsUrl)&&cfg.passHash){
+  // Admin configurado neste navegador
   startApp();
-} else if(PUBLIC_CFG) {
-  // Professor ou admin em novo dispositivo - usa config publica
+} else if(PUBLIC_CFG){
+  // Professores: usa config publica embutida, sem setup
   cfg = PUBLIC_CFG;
-  if(isAdminUrl) {
-    // URL tem ?admin - mostra opcao de login mas ja carrega acervo
-    startApp();
-  } else {
-    // Professor normal - vai direto ao acervo sem opcao de admin
-    startAppViewer();
-  }
-} else if(isAdminUrl) {
-  // Admin em novo dispositivo sem PUBLIC_CFG - mostra setup
-  document.getElementById('setup-screen').style.display='flex';
+  startAppViewer();
 } else {
-  // Professor sem PUBLIC_CFG ainda - mostra aviso
-  document.getElementById('setup-screen').style.display='none';
-  document.getElementById('app').style.display='block';
-  document.getElementById('acervo-grid').innerHTML='<div style="grid-column:1/-1" class="empty"><div class="empty-ico">⏳</div><div class="empty-t">Acervo em configuracao</div><div class="empty-d">O administrador ainda esta configurando o sistema.<br>Tente novamente em breve.</div></div>';
-  document.getElementById('hero-count').textContent='Em breve disponivel';
-  document.getElementById('toggle-btn').style.display='none';
+  // Nenhuma config: mostra setup
+  document.getElementById('setup-screen').style.display='flex';
 }
 
 function startAppViewer(){
+  // Modo somente leitura para professores
   document.getElementById('setup-screen').style.display='none';
   document.getElementById('app').style.display='block';
-  document.getElementById('toggle-btn').style.display='none';
   applyNome();
   cloudLoad().then(function(){renderAcervo();updateChips();});
 }
