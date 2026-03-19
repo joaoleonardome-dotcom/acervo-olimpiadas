@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acervo Olimpico</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Nunito:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f4f2ed; --surface:#fff; --surface2:#f9f8f5; --border:#e2ddd5; --border2:#cdc8be;
+  --text:#1e1b16; --muted:#8a8070; --accent:#c0532a; --accent2:#2a6e8a;
+  --green:#2a7a4a; --purple:#5a3a8a; --danger:#b83030; --admin:#2a5a8a;
+  --r:10px; --shadow:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.05);
+  --shadow-lg:0 4px 24px rgba(0,0,0,.1),0 1px 4px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* SETUP */
+#setup-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(ellipse at 20% 50%,rgba(192,83,42,.06) 0%,transparent 55%),
+             radial-gradient(ellipse at 80% 20%,rgba(42,110,138,.06) 0%,transparent 55%),var(--bg)}
+.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 44px;width:600px;max-width:100%;box-shadow:var(--shadow-lg)}
+.setup-logo{font-family:'Lora',serif;font-size:28px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.setup-logo-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
+.setup-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.7}
+.setup-step{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:14px}
+.step-row{display:flex;align-items:flex-start;gap:14px}
+.step-num{width:24px;height:24px;flex-shrink:0;background:var(--accent);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.step-content{flex:1}
+.step-title{font-weight:700;font-size:14px;margin-bottom:6px}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:10px}
+.step-link{color:var(--accent);text-decoration:none;font-weight:700;border-bottom:1px dashed rgba(192,83,42,.4)}
+
+/* TAB BUTTONS */
+.tab-row{display:flex;gap:8px;margin:10px 0 14px}
+.tab-btn{flex:1;padding:10px;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .18s}
+.tab-btn.active{border:2px solid var(--accent);background:rgba(192,83,42,.07);color:var(--accent)}
+.tab-btn.inactive{border:2px solid var(--border);background:var(--surface2);color:var(--muted)}
+.tab-btn.active-blue{border:2px solid var(--admin);background:rgba(42,90,138,.07);color:var(--admin)}
+
+/* FORM */
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.fi,.fs,.ft{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;
+  font-family:'Nunito',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .18s,box-shadow .18s}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(192,83,42,.1);background:#fff}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fhint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.7}
+.fa{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .18s;text-decoration:none;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(192,83,42,.25)}
+.btn-primary:hover{background:#a84420;transform:translateY(-1px)}
+.btn-admin{background:var(--admin);color:#fff;box-shadow:0 2px 8px rgba(42,90,138,.2)}
+.btn-admin:hover{background:#1e4a75;transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--text);border:1.5px solid var(--border)}
+.btn-ghost:hover{border-color:var(--border2);background:var(--surface2)}
+.btn-danger{background:rgba(184,48,48,.07);color:var(--danger);border:1.5px solid rgba(184,48,48,.2)}
+.btn-danger:hover{background:rgba(184,48,48,.14)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-xs{padding:4px 10px;font-size:11px;border-radius:7px}
+.btn-full{width:100%;justify-content:center;padding:13px;font-size:14px}
+
+/* HELP BOX */
+.help-box{background:rgba(192,83,42,.04);border:1px solid rgba(192,83,42,.18);border-radius:9px;padding:13px 15px;font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:14px}
+.help-box strong{color:var(--accent)}
+.help-box ol{padding-left:16px;margin-top:5px}
+.warn-box{background:rgba(184,48,48,.05);border:1px solid rgba(184,48,48,.2);border-radius:9px;padding:11px 14px;font-size:12px;color:var(--danger);margin-bottom:14px;font-weight:600}
+
+/* CODE BOX */
+.code-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px}
+.code-box pre{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text);white-space:pre-wrap;word-break:break-all;line-height:1.6;margin:0;max-height:150px;overflow-y:auto}
+
+/* RESULT */
+.result{font-size:12px;margin-top:8px;padding:8px 12px;border-radius:7px;display:none}
+.result.ok{background:rgba(42,122,74,.08);border:1px solid rgba(42,122,74,.2);color:var(--green)}
+.result.err{background:rgba(184,48,48,.08);border:1px solid rgba(184,48,48,.2);color:var(--danger)}
+
+/* LAYOUT */
+#app{display:none}
+.sidebar{width:252px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;box-shadow:2px 0 12px rgba(0,0,0,.04)}
+.logo{padding:24px 20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.logo-icon{width:38px;height:38px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;flex-shrink:0}
+.logo-name{font-family:'Lora',serif;font-size:15px;font-weight:700}
+.logo-sub-text{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:2px}
+nav{padding:14px 10px;flex:1;overflow-y:auto}
+.nav-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);padding:0 12px;margin:14px 0 5px;font-weight:700}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);transition:all .18s;user-select:none}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(192,83,42,.08);color:var(--accent)}
+.nav-item.admin-item.active{background:rgba(42,90,138,.08);color:var(--admin)}
+.nav-icon{font-size:15px;width:20px;text-align:center}
+.nav-chip{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;font-family:'JetBrains Mono',monospace}
+.admin-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(42,90,138,.1);color:var(--admin);border:1px solid rgba(42,90,138,.2);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle}
+.mode-toggle{margin:0 10px 12px;display:flex;align-items:center;gap:9px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);transition:all .18s}
+.mode-toggle:hover{border-color:var(--accent);color:var(--accent);background:rgba(192,83,42,.04)}
+.mode-toggle.is-admin{color:var(--admin);border-color:rgba(42,90,138,.35);background:rgba(42,90,138,.05)}
+.sidebar-footer{padding:14px 18px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);line-height:1.7}
+.main{margin-left:252px;min-height:100vh}
+.topbar{padding:16px 34px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.page-title{font-family:'Lora',serif;font-size:20px;font-weight:700}
+.page-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.page{display:none;padding:28px 34px;animation:fadeUp .25s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.stat:nth-child(2)::before{background:var(--accent2)}
+.stat:nth-child(3)::before{background:var(--green)}
+.stat:nth-child(4)::before{background:var(--purple)}
+.stat-icon{font-size:20px;margin-bottom:8px}
+.stat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700}
+.stat-num{font-family:'Lora',serif;font-size:36px;font-weight:700;line-height:1.1;margin:6px 0 4px}
+.stat-note{font-size:11px;color:var(--muted)}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow)}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2)}
+.card-title{font-family:'Lora',serif;font-size:15px;font-weight:700}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:11px 16px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;background:var(--surface2);border-bottom:1px solid var(--border)}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid rgba(226,221,213,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(192,83,42,.02)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.b1{background:rgba(42,122,74,.1);color:var(--green);border:1px solid rgba(42,122,74,.2)}
+.b2{background:rgba(192,83,42,.1);color:var(--accent);border:1px solid rgba(192,83,42,.2)}
+.b3{background:rgba(42,110,138,.1);color:var(--accent2);border:1px solid rgba(42,110,138,.2)}
+.bo{background:rgba(90,58,138,.1);color:var(--purple);border:1px solid rgba(90,58,138,.2)}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(30,27,22,.45);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:540px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:popIn .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.94) translateY(14px)}to{opacity:1;transform:none}}
+.modal-head{padding:22px 24px 0;display:flex;align-items:flex-start;justify-content:space-between}
+.modal-title{font-family:'Lora',serif;font-size:19px;font-weight:700}
+.modal-desc{font-size:12px;color:var(--muted);margin-top:3px}
+.modal-x{background:var(--surface2);border:1.5px solid var(--border);color:var(--muted);width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0}
+.modal-x:hover{background:var(--border);color:var(--text)}
+.modal-body{padding:18px 24px 24px}
+
+/* COLORS */
+.colors{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.c-dot{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .18s}
+.c-dot.sel{border-color:var(--text);transform:scale(1.2);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+
+/* FILTER */
+.filter-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.filter-row .fi{flex:1;min-width:180px}
+.filter-row .fs{width:165px}
+
+/* GRID CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:16px}
+.prova-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;transition:all .22s;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.prova-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--card-color,var(--accent));border-radius:var(--r) 0 0 var(--r)}
+.prova-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.card-olimp-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:9px;padding-left:2px}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.card-main{font-family:'Lora',serif;font-size:18px;font-weight:700;line-height:1.3;margin-bottom:12px;padding-left:2px}
+.card-badges{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;padding-left:2px}
+.card-obs{font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.6;padding-left:2px}
+.card-actions{display:flex;gap:8px}
+.card-actions .btn{flex:1;justify-content:center}
+
+/* HERO */
+.acervo-hero{background:linear-gradient(135deg,var(--accent) 0%,#a84420 100%);border-radius:var(--r);padding:26px 30px;margin-bottom:24px;color:#fff;position:relative;overflow:hidden}
+.acervo-hero::after{content:'\\2211';position:absolute;right:26px;top:50%;transform:translateY(-50%);font-family:'Lora',serif;font-size:76px;font-weight:700;opacity:.12;line-height:1}
+.hero-title{font-family:'Lora',serif;font-size:21px;font-weight:700;margin-bottom:4px}
+.hero-sub{font-size:13px;opacity:.8}
+
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-ico{font-size:38px;margin-bottom:12px;opacity:.45}
+.empty-t{font-family:'Lora',serif;font-size:16px;color:var(--text);margin-bottom:6px}
+.empty-d{font-size:12px;line-height:1.7}
+
+/* CONFIG */
+.config-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;margin-bottom:16px;box-shadow:var(--shadow)}
+.config-title{font-family:'Lora',serif;font-size:16px;font-weight:700;margin-bottom:4px}
+.config-sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6}
+
+/* LOADING */
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(244,242,237,.85);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(4px)}
+.loading-overlay.show{display:flex}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--muted);font-weight:600}
+
+/* TOAST */
+.toast-container{position:fixed;bottom:22px;right:22px;z-index:999;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:10px;padding:11px 15px;min-width:250px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);animation:slideIn .25s ease}
+.toast.err{border-left-color:var(--danger)}
+.toast.warn{border-left-color:var(--accent)}
+@keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+
+@media(max-width:900px){.stats-row{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.topbar,.page{padding-left:16px;padding-right:16px}.stats-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <div class="setup-logo">
+      <div class="setup-logo-icon">&#x2211;</div>
+      Acervo Olimpico
+    </div>
+    <div class="setup-sub">Configure o sistema uma unica vez. Tudo fica salvo no navegador.</div>
+
+    <!-- STEP 1: Banco de dados -->
+    <div class="setup-step">
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Escolha onde guardar os dados</div>
+          <div class="tab-row">
+            <button class="tab-btn active" id="tab-jsonbin" onclick="selectProvider('jsonbin')">&#x1F4E6; JSONBin.io</button>
+            <button class="tab-btn inactive" id="tab-sheets" onclick="selectProvider('sheets')">&#x1F4CA; Google Sheets</button>
+          </div>
+
+          <!-- JSONBin -->
+          <div id="prov-jsonbin">
+            <div class="help-box">
+              1. Acesse <a class="step-link" href="https://jsonbin.io" target="_blank">jsonbin.io</a> e crie uma conta<br>
+              2. <strong>Confirme o e-mail recebido</strong> (verifique spam tambem)<br>
+              3. No painel, clique em <strong>API Keys</strong> e copie a <strong>Master Key</strong>
+            </div>
+            <div class="warn-box">&#x26A0;&#xFE0F; Sem confirmar o e-mail, a chave nao funciona!</div>
+            <div class="fg">
+              <label class="fl">Master Key do JSONBin</label>
+              <div style="position:relative">
+                <input class="fi" id="setup-apikey" placeholder="$2a$10$..." type="text"
+                  style="padding-right:76px;font-family:'JetBrains Mono',monospace;font-size:12px">
+                <button onclick="testApiKey()"
+                  style="position:absolute;right:7px;top:50%;transform:translateY(-50%);background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">
+                  Testar
+                </button>
+              </div>
+              <div class="fhint">Comeca com <code style="background:var(--surface2);padding:1px 5px;border-radius:4px">$2a$10$</code></div>
+              <div id="jsonbin-result" class="result"></div>
+            </div>
+          </div>
+
+          <!-- Google Sheets -->
+          <div id="prov-sheets" style="display:none">
+            <div class="help-box">
+              1. Acesse <a class="step-link" href="https://script.google.com" target="_blank">script.google.com</a> &rarr; <strong>Novo projeto</strong><br>
+              2. Apague o codigo existente e cole o codigo abaixo<br>
+              3. Clique em <strong>Implantar &rarr; Nova implantacao &rarr; App da Web</strong><br>
+              4. Em "Quem pode acessar" escolha <strong>Qualquer pessoa</strong> &rarr; Implantar<br>
+              5. Copie a URL gerada (termina com /exec) e cole abaixo
+            </div>
+            <div class="code-box">
+              <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:7px">Codigo para o Google Apps Script:</div>
+              <pre id="gas-code">function doGet(e){
+  var action = e&&e.parameter&&e.parameter.action;
+  var sheet = getSheet();
+  if(action==='load'){
+    var val = sheet.getRange(2,1).getValue();
+    return out(val||'{"olimpiadas":[],"provas":[]}');
+  }
+  return out('{"olimpiadas":[],"provas":[]}');
+}
+function doPost(e){
+  var sheet = getSheet();
+  sheet.getRange(2,1).setValue(e.postData.contents);
+  return out('ok');
+}
+function getSheet(){
+  var p=PropertiesService.getScriptProperties().getProperty('SID');
+  var ss=p?SpreadsheetApp.openById(p):SpreadsheetApp.create('AcervoOlimpiadas');
+  if(!p){PropertiesService.getScriptProperties().setProperty('SID',ss.getId());}
+  var sh=ss.getSheetByName('data');
+  if(!sh){sh=ss.insertSheet('data');sh.appendRow(['json']);}
+  return sh;
+}
+function out(s){
+  return ContentService.createTextOutput(s).setMimeType(ContentService.MimeType.JSON);
+}</pre>
+              <button onclick="copyGasCode()"
+                style="margin-top:9px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">
+                &#x1F4CB; Copiar codigo
+              </button>
+            </div>
+            <div class="fg">
+              <label class="fl">URL do Web App</label>
+              <input class="fi" id="setup-sheets-url" placeholder="https://script.google.com/macros/s/.../exec"
+                style="font-family:'JetBrains Mono',monospace;font-size:11px">
+              <div class="fhint">Deve terminar com <code style="background:var(--surface2);padding:1px 4px;border-radius:4px">/exec</code></div>
+              <div id="sheets-result" class="result"></div>
+            </div>
+            <button onclick="testSheets()"
+              style="background:var(--admin);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">
+              Testar conexao
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Senha -->
+    <div class="setup-step">
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Senha de administrador</div>
+          <div class="step-desc">So voce vai saber. Os professores acessam o acervo sem senha.</div>
+          <div class="fr">
+            <div class="fg">
+              <label class="fl">Senha admin</label>
+              <input class="fi" id="setup-pass" type="password" placeholder="min. 4 caracteres">
+            </div>
+            <div class="fg">
+              <label class="fl">Confirmar senha</label>
+              <input class="fi" id="setup-pass2" type="password" placeholder="repita a senha">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Nome -->
+    <div class="setup-step">
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Nome do acervo (opcional)</div>
+          <div class="fg" style="margin-top:10px;margin-bottom:0">
+            <label class="fl">Nome exibido</label>
+            <input class="fi" id="setup-nome" placeholder="Ex: Acervo de Olimpiadas - Prof. Joao Silva">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="finishSetup()" style="margin-top:10px">
+      &#x1F680; Configurar e entrar no sistema
+    </button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">&#x2211;</div>
+      <div>
+        <div class="logo-name" id="sidebar-nome">Acervo Olimpico</div>
+        <div class="logo-sub-text">Olimpiadas Cientificas</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-label">Acervo</div>
+      <div class="nav-item active" id="nav-acervo" onclick="goto('acervo')">
+        <span class="nav-icon">&#x1F4DA;</span> Acervo de Provas
+        <span class="nav-chip" id="chip-acervo">0</span>
+      </div>
+      <div id="admin-nav" style="display:none">
+        <div class="nav-label">Administrar <span class="admin-pill">&#x1F511; Admin</span></div>
+        <div class="nav-item admin-item" id="nav-dashboard" onclick="goto('dashboard')">
+          <span class="nav-icon">&#x25C8;</span> Dashboard
+        </div>
+        <div class="nav-item admin-item" id="nav-provas" onclick="goto('provas')">
+          <span class="nav-icon">&#x1F4C4;</span> Gerenciar Provas
+        </div>
+        <div class="nav-item admin-item" id="nav-olimpiadas" onclick="goto('olimpiadas')">
+          <span class="nav-icon">&#x1F3C5;</span> Olimpiadas
+        </div>
+        <div class="nav-item admin-item" id="nav-config" onclick="goto('config')">
+          <span class="nav-icon">&#x2699;&#xFE0F;</span> Configuracoes
+        </div>
+      </div>
+    </nav>
+    <div class="mode-toggle" id="toggle-btn" onclick="toggleAdmin()">
+      <span id="toggle-icon">&#x1F512;</span>
+      <span id="toggle-label">Entrar como Admin</span>
+    </div>
+    <div class="sidebar-footer">
+      <span id="footer-nome" style="font-weight:700;color:var(--text)">Acervo Olimpico</span><br>
+      <span style="color:var(--accent)">Matematica &amp; Ciencias</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="page-title" id="top-title">Acervo de Provas</div>
+        <div class="page-sub" id="top-sub">Navegue e baixe as provas disponiveis</div>
+      </div>
+      <div id="top-actions"></div>
+    </div>
+
+    <!-- ACERVO -->
+    <div class="page active" id="page-acervo">
+      <div class="acervo-hero">
+        <div class="hero-title" id="hero-title">Acervo de Olimpiadas Cientificas</div>
+        <div class="hero-sub" id="hero-count">Carregando...</div>
+      </div>
+      <div class="filter-row">
+        <input class="fi" id="f-search" placeholder="&#x1F50D; Buscar por olimpiada, ano..." oninput="renderAcervo()">
+        <select class="fs" id="f-olimp" onchange="renderAcervo()"><option value="">Todas as olimpiadas</option></select>
+        <select class="fs" id="f-fase" onchange="renderAcervo()">
+          <option value="">Todas as fases</option>
+          <option value="1">1 Fase</option>
+          <option value="2">2 Fase</option>
+          <option value="3">3 Fase</option>
+        </select>
+        <select class="fs" id="f-ano" onchange="renderAcervo()"><option value="">Todos os anos</option></select>
+      </div>
+      <div class="grid" id="acervo-grid">
+        <div style="grid-column:1/-1" class="empty"><div class="empty-ico">&#x1F4DA;</div><div class="empty-t">Carregando...</div></div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page" id="page-dashboard">
+      <div class="stats-row">
+        <div class="stat"><div class="stat-icon">&#x1F4C4;</div><div class="stat-label">Provas</div><div class="stat-num" id="s-provas">0</div><div class="stat-note">no acervo</div></div>
+        <div class="stat"><div class="stat-icon">&#x1F3C5;</div><div class="stat-label">Olimpiadas</div><div class="stat-num" id="s-olimp">0</div><div class="stat-note">competicoes</div></div>
+        <div class="stat"><div class="stat-icon">&#x1F4C5;</div><div class="stat-label">Anos</div><div class="stat-num" id="s-anos">0</div><div class="stat-note">cobertos</div></div>
+        <div class="stat"><div class="stat-icon">&#x1F3AF;</div><div class="stat-label">Fases</div><div class="stat-num">3</div><div class="stat-note">1a, 2a e 3a</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Olimpiadas cadastradas</div><button class="btn btn-admin btn-sm" onclick="openOlimpModal()">+ Nova Olimpiada</button></div>
+        <div id="dash-olimp"><div class="empty"><div class="empty-ico">&#x1F3C5;</div><div class="empty-t">Nenhuma olimpiada</div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Ultimas provas adicionadas</div><button class="btn btn-ghost btn-sm" onclick="goto('provas')">Ver todas</button></div>
+        <div id="dash-recent"><div class="empty"><div class="empty-ico">&#x1F4C4;</div><div class="empty-t">Nenhuma prova ainda</div></div></div>
+      </div>
+    </div>
+
+    <!-- PROVAS -->
+    <div class="page" id="page-provas">
+      <div class="filter-row">
+        <input class="fi" id="fp-search" placeholder="&#x1F50D; Buscar..." oninput="renderProvasAdmin()">
+        <select class="fs" id="fp-olimp" onchange="renderProvasAdmin()"><option value="">Todas</option></select>
+      </div>
+      <div class="card">
+        <table><thead><tr><th>Olimpiada</th><th>Ano</th><th>Fase</th><th>Obs</th><th>Link</th><th>Acoes</th></tr></thead>
+        <tbody id="tbody-provas"></tbody></table>
+      </div>
+    </div>
+
+    <!-- OLIMPIADAS -->
+    <div class="page" id="page-olimpiadas">
+      <div class="card">
+        <table><thead><tr><th>Cor</th><th>Nome</th><th>Sigla</th><th>Area</th><th>Provas</th><th>Acoes</th></tr></thead>
+        <tbody id="tbody-olimp"></tbody></table>
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="page" id="page-config">
+      <div class="config-section">
+        <div class="config-title">Credencial da nuvem</div>
+        <div class="config-sub" id="cfg-cloud-sub">Chave usada para salvar os dados.</div>
+        <div class="fg"><label class="fl" id="cfg-cloud-label">API Key / URL</label><input class="fi" id="cfg-cloud" type="text" placeholder="..."></div>
+        <button class="btn btn-admin btn-sm" onclick="saveConfig('cloud')">Salvar</button>
+      </div>
+      <div class="config-section">
+        <div class="config-title">Alterar senha de admin</div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Nova senha</label><input class="fi" id="cfg-pass" type="password" placeholder="..."></div>
+          <div class="fg"><label class="fl">Confirmar</label><input class="fi" id="cfg-pass2" type="password" placeholder="..."></div>
+        </div>
+        <button class="btn btn-admin btn-sm" onclick="saveConfig('pass')">Salvar senha</button>
+      </div>
+      <div class="config-section">
+        <div class="config-title">Nome do acervo</div>
+        <div class="fg" style="margin-top:14px"><label class="fl">Nome</label><input class="fi" id="cfg-nome" placeholder="Ex: Acervo Prof. Joao"></div>
+        <button class="btn btn-admin btn-sm" onclick="saveConfig('nome')">Salvar nome</button>
+      </div>
+      <div class="config-section" style="border-color:rgba(184,48,48,.25)">
+        <div class="config-title" style="color:var(--danger)">Zona de perigo</div>
+        <div class="config-sub">Remove as configuracoes locais. Os dados na nuvem permanecem.</div>
+        <button class="btn btn-danger btn-sm" onclick="resetAll()">Apagar configuracoes locais</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: Login -->
+<div class="overlay" id="m-login">
+  <div class="modal" style="width:360px">
+    <div class="modal-head">
+      <div><div class="modal-title">Area Admin</div><div class="modal-desc">Digite sua senha para continuar</div></div>
+      <button class="modal-x" onclick="closeModal('m-login')">x</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Senha</label><input class="fi" id="login-pass" type="password" placeholder="..." onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fa"><button class="btn btn-ghost" onclick="closeModal('m-login')">Cancelar</button><button class="btn btn-admin" onclick="doLogin()">Entrar</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Olimpiada -->
+<div class="overlay" id="m-olimp">
+  <div class="modal">
+    <div class="modal-head">
+      <div><div class="modal-title" id="mo-title">Nova Olimpiada</div><div class="modal-desc">Cadastrar competicao cientifica</div></div>
+      <button class="modal-x" onclick="closeModal('m-olimp')">x</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="mo-id">
+      <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="mo-nome" placeholder="Ex: Olimpiada Brasileira de Matematica"></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Sigla</label><input class="fi" id="mo-sigla" placeholder="OBMEP" style="text-transform:uppercase"></div>
+        <div class="fg"><label class="fl">Area</label>
+          <select class="fs" id="mo-area">
+            <option>Matematica</option><option>Fisica</option><option>Quimica</option>
+            <option>Biologia</option><option>Astronomia</option><option>Informatica</option>
+            <option>Multidisciplinar</option><option>Outra</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Cor</label>
+        <div class="colors" id="color-picker">
+          <div class="c-dot sel" style="background:#c0532a" data-c="#c0532a" onclick="pickColor(this)"></div>
+          <div class="c-dot" style="background:#2a6e8a" data-c="#2a6e8a" onclick="pickColor(this)"></div>
+          <div class="c-dot" style="background:#2a7a4a" data-c="#2a7a4a" onclick="pickColor(this)"></div>
+          <div class="c-dot" style="background:#5a3a8a" data-c="#5a3a8a" onclick="pickColor(this)"></div>
+          <div class="c-dot" style="background:#b83030" data-c="#b83030" onclick="pickColor(this)"></div>
+          <div class="c-dot" style="background:#7a5a20" data-c="#7a5a20" onclick="pickColor(this)"></div>
+          <div class="c-dot" style="background:#1a6a6a" data-c="#1a6a6a" onclick="pickColor(this)"></div>
+          <div class="c-dot" style="background:#8a3a60" data-c="#8a3a60" onclick="pickColor(this)"></div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Observacoes</label><textarea class="ft" id="mo-obs" rows="2" placeholder="Notas..."></textarea></div>
+      <div class="fa"><button class="btn btn-ghost" onclick="closeModal('m-olimp')">Cancelar</button><button class="btn btn-admin" onclick="salvarOlimp()">Salvar Olimpiada</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Prova -->
+<div class="overlay" id="m-prova">
+  <div class="modal">
+    <div class="modal-head">
+      <div><div class="modal-title" id="mp-title">Cadastrar Prova</div><div class="modal-desc">Adicionar PDF via link do OneDrive</div></div>
+      <button class="modal-x" onclick="closeModal('m-prova')">x</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="mp-id">
+      <div class="help-box">
+        <strong>Como pegar o link do OneDrive:</strong>
+        <ol>
+          <li>Faca upload do PDF no OneDrive</li>
+          <li>Clique com botao direito no arquivo &rarr; <strong>Compartilhar</strong></li>
+          <li>Escolha <strong>"Qualquer pessoa com o link"</strong> e copie</li>
+          <li>Cole o link abaixo</li>
+        </ol>
+        Tambem funciona com <strong>Google Drive</strong> e links diretos de PDF.
+      </div>
+      <div class="fg"><label class="fl">Olimpiada</label><select class="fs" id="mp-olimp"><option value="">- Selecione -</option></select></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Ano</label><input class="fi" id="mp-ano" type="number" min="1990" max="2030" placeholder="2024"></div>
+        <div class="fg"><label class="fl">Fase</label>
+          <select class="fs" id="mp-fase"><option value="1">1 Fase</option><option value="2">2 Fase</option><option value="3">3 Fase</option></select>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Link do PDF (OneDrive, Google Drive ou URL direta)</label>
+        <input class="fi" id="mp-link" placeholder="https://1drv.ms/b/... ou https://drive.google.com/...">
+      </div>
+      <div class="fg"><label class="fl">Observacoes</label><textarea class="ft" id="mp-obs" rows="2" placeholder="Gabarito incluso? Tipo de questoes?"></textarea></div>
+      <div class="fa"><button class="btn btn-ghost" onclick="closeModal('m-prova')">Cancelar</button><button class="btn btn-admin" onclick="salvarProva()">Salvar Prova</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">Aguarde...</div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-container" id="toasts"></div>
+
+<script>
+var CFG_KEY = 'acervo_cfg_v4';
+var cfg = {};
+var db = {olimpiadas:[], provas:[]};
+var isAdmin = false;
+var pickedColor = '#c0532a';
+var activeProvider = 'jsonbin';
+
+function loadCfg(){var r=localStorage.getItem(CFG_KEY);if(r)cfg=JSON.parse(r);}
+function saveCfg(){localStorage.setItem(CFG_KEY,JSON.stringify(cfg));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function hashPass(p){var h=0;for(var i=0;i<p.length;i++)h=Math.imul(31,h)+p.charCodeAt(i)|0;return h.toString(36)+p.length;}
+
+// ── PROVIDER SETUP ──────────────────────────────────────────
+function selectProvider(p){
+  activeProvider=p;
+  document.getElementById('prov-jsonbin').style.display=p==='jsonbin'?'block':'none';
+  document.getElementById('prov-sheets').style.display=p==='sheets'?'block':'none';
+  var bj=document.getElementById('tab-jsonbin'), bs=document.getElementById('tab-sheets');
+  if(p==='jsonbin'){bj.className='tab-btn active';bs.className='tab-btn inactive';}
+  else{bs.className='tab-btn active-blue';bj.className='tab-btn inactive';}
+}
+
+function copyGasCode(){
+  var code=document.getElementById('gas-code').textContent;
+  navigator.clipboard.writeText(code).then(function(){toast('Codigo copiado');}).catch(function(){toast('Selecione e copie manualmente','warn');});
+}
+
+function showResult(id,msg,type){
+  var el=document.getElementById(id);
+  el.className='result '+(type||'ok');
+  el.textContent=msg;
+  el.style.display='block';
+}
+
+function testApiKey(){
+  var apiKey=document.getElementById('setup-apikey').value.trim();
+  if(!apiKey){showResult('jsonbin-result','Cole a API Key primeiro.','err');return;}
+  showResult('jsonbin-result','Testando...','ok');
+  fetch('https://api.jsonbin.io/v3/b',{method:'POST',headers:{'X-Master-Key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({test:true})})
+  .then(function(res){return res.json().then(function(d){return{ok:res.ok,d:d};});})
+  .then(function(r){
+    if(r.ok&&r.d.metadata){
+      fetch('https://api.jsonbin.io/v3/b/'+r.d.metadata.id,{method:'DELETE',headers:{'X-Master-Key':apiKey}}).catch(function(){});
+      showResult('jsonbin-result','Chave valida! Pode continuar.','ok');
+    } else {
+      var msg=r.d.message||'Chave invalida';
+      var extra=msg.toLowerCase().indexOf('verif')>=0?' - CONFIRME SEU E-MAIL no JSONBin!':'';
+      showResult('jsonbin-result','Erro: '+msg+extra,'err');
+    }
+  })
+  .catch(function(e){showResult('jsonbin-result','Falha de conexao: '+e.message,'err');});
+}
+
+function testSheets(){
+  var url=document.getElementById('setup-sheets-url').value.trim();
+  if(!url||url.indexOf('/exec')<0){showResult('sheets-result','A URL deve terminar com /exec','err');return;}
+  showResult('sheets-result','Testando...','ok');
+  fetch(url+'?action=load').then(function(r){return r.text();})
+  .then(function(t){JSON.parse(t);showResult('sheets-result','Conexao OK! Pode continuar.','ok');})
+  .catch(function(e){showResult('sheets-result','Falha - verifique se implantou como Qualquer pessoa. ('+e.message+')','err');});
+}
+
+function finishSetup(){
+  var pass=document.getElementById('setup-pass').value;
+  var pass2=document.getElementById('setup-pass2').value;
+  var nome=document.getElementById('setup-nome').value.trim()||'Acervo Olimpico';
+  if(!pass){toast('Defina uma senha de admin!','err');return;}
+  if(pass!==pass2){toast('As senhas nao coincidem!','err');return;}
+
+  if(activeProvider==='jsonbin'){
+    var apiKey=document.getElementById('setup-apikey').value.trim();
+    if(!apiKey){toast('Informe a API Key do JSONBin!','err');return;}
+    showLoading('Criando banco de dados...');
+    fetch('https://api.jsonbin.io/v3/b',{method:'POST',headers:{'X-Master-Key':apiKey,'Content-Type':'application/json','X-Bin-Versioning':'false'},body:JSON.stringify({olimpiadas:[],provas:[]})})
+    .then(function(res){return res.json().then(function(d){return{ok:res.ok,d:d};});})
+    .then(function(r){
+      hideLoading();
+      if(!r.ok){
+        var msg=r.d.message||'HTTP error';
+        var extra=msg.toLowerCase().indexOf('verif')>=0?' - CONFIRME SEU E-MAIL no JSONBin e tente novamente!':'';
+        showResult('jsonbin-result','Erro: '+msg+extra,'err');
+        toast('Erro: '+msg,'err');return;
+      }
+      cfg={provider:'jsonbin',apiKey:apiKey,binId:r.d.metadata.id,passHash:hashPass(pass),nome:nome};
+      saveCfg();toast('Configuracao concluida!');startApp();
+    })
+    .catch(function(e){hideLoading();toast('Falha de conexao: '+e.message,'err');});
+  } else {
+    var sheetsUrl=document.getElementById('setup-sheets-url').value.trim();
+    if(!sheetsUrl||sheetsUrl.indexOf('/exec')<0){toast('Informe a URL do Google Apps Script!','err');return;}
+    showLoading('Testando Google Sheets...');
+    fetch(sheetsUrl).then(function(r){return r.text();})
+    .then(function(t){JSON.parse(t);hideLoading();cfg={provider:'sheets',sheetsUrl:sheetsUrl,passHash:hashPass(pass),nome:nome};saveCfg();toast('Configuracao concluida!');startApp();})
+    .catch(function(e){hideLoading();toast('Falha: verifique a URL e as permissoes.','err');});
+  }
+}
+
+// ── CLOUD ────────────────────────────────────────────────────
+function cloudLoad(){
+  showLoading('Carregando acervo...');
+  var p;
+  if(cfg.provider==='sheets'){
+    p=fetch(cfg.sheetsUrl+'?action=load').then(function(r){return r.text();}).then(function(t){db=JSON.parse(t);});
+  } else {
+    p=fetch('https://api.jsonbin.io/v3/b/'+cfg.binId+'/latest',{headers:{'X-Master-Key':cfg.apiKey,'X-Bin-Versioning':'false'}})
+    .then(function(r){return r.json();}).then(function(d){db=d.record||{olimpiadas:[],provas:[]};});
+  }
+  return p.then(function(){
+    if(!db.olimpiadas)db.olimpiadas=[];
+    if(!db.provas)db.provas=[];
+  }).catch(function(e){toast('Erro ao carregar: '+e.message,'err');db={olimpiadas:[],provas:[]};})
+  .finally(function(){hideLoading();});
+}
+
+function cloudSave(){
+  showLoading('Salvando...');
+  var p;
+  if(cfg.provider==='sheets'){
+    p=fetch(cfg.sheetsUrl,{method:'POST',body:JSON.stringify(db)});
+  } else {
+    p=fetch('https://api.jsonbin.io/v3/b/'+cfg.binId,{method:'PUT',headers:{'X-Master-Key':cfg.apiKey,'Content-Type':'application/json','X-Bin-Versioning':'false'},body:JSON.stringify(db)})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);});
+  }
+  return p.catch(function(e){toast('Erro ao salvar: '+e.message,'err');throw e;})
+  .finally(function(){hideLoading();});
+}
+
+// ── APP START ────────────────────────────────────────────────
+function startApp(){
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  applyNome();
+  cloudLoad().then(function(){renderAcervo();updateChips();});
+}
+
+function applyNome(){
+  var n=cfg.nome||'Acervo Olimpico';
+  document.getElementById('sidebar-nome').textContent=n;
+  document.getElementById('footer-nome').textContent=n;
+  document.getElementById('hero-title').textContent=n;
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────
+var META={
+  acervo:['Acervo de Provas','Navegue e baixe as provas disponiveis',''],
+  dashboard:['Dashboard','Visao geral do acervo','<button class="btn btn-admin btn-sm" onclick="openOlimpModal()">+ Olimpiada</button> <button class="btn btn-admin btn-sm" onclick="openProvaModal()">+ Prova</button>'],
+  provas:['Gerenciar Provas','Cadastre e edite as provas','<button class="btn btn-admin" onclick="openProvaModal()">+ Nova Prova</button>'],
+  olimpiadas:['Olimpiadas','Gerencie as competicoes','<button class="btn btn-admin" onclick="openOlimpModal()">+ Nova Olimpiada</button>'],
+  config:['Configuracoes','Ajustes do sistema','']
+};
+
+function goto(p){
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');});
+  document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('active');});
+  document.getElementById('page-'+p).classList.add('active');
+  var nav=document.getElementById('nav-'+p);if(nav)nav.classList.add('active');
+  var m=META[p];
+  document.getElementById('top-title').textContent=m[0];
+  document.getElementById('top-sub').textContent=m[1];
+  document.getElementById('top-actions').innerHTML=m[2];
+  if(p==='acervo')renderAcervo();
+  if(p==='dashboard')renderDashboard();
+  if(p==='provas')renderProvasAdmin();
+  if(p==='olimpiadas')renderOlimTable();
+  if(p==='config')loadConfig();
+}
+
+// ── ADMIN ────────────────────────────────────────────────────
+function toggleAdmin(){
+  if(isAdmin){
+    isAdmin=false;
+    document.getElementById('admin-nav').style.display='none';
+    document.getElementById('toggle-icon').textContent='🔒';
+    document.getElementById('toggle-label').textContent='Entrar como Admin';
+    document.getElementById('toggle-btn').classList.remove('is-admin');
+    goto('acervo');toast('Modo admin desativado');
+  } else {
+    document.getElementById('login-pass').value='';
+    openModal('m-login');
+    setTimeout(function(){document.getElementById('login-pass').focus();},100);
+  }
+}
+
+function doLogin(){
+  var pass=document.getElementById('login-pass').value;
+  if(hashPass(pass)===cfg.passHash){
+    isAdmin=true;closeModal('m-login');
+    document.getElementById('admin-nav').style.display='block';
+    document.getElementById('toggle-icon').textContent='🔓';
+    document.getElementById('toggle-label').textContent='Sair do Admin';
+    document.getElementById('toggle-btn').classList.add('is-admin');
+    goto('dashboard');toast('Bem-vindo, professor!');
+  } else {
+    toast('Senha incorreta!','err');document.getElementById('login-pass').value='';
+  }
+}
+
+// ── MODAL ────────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('open');});});
+
+// ── OLIMPIADAS ───────────────────────────────────────────────
+function pickColor(el){
+  document.querySelectorAll('.c-dot').forEach(function(d){d.classList.remove('sel');});
+  el.classList.add('sel');pickedColor=el.dataset.c;
+}
+
+function openOlimpModal(editId){
+  if(editId){
+    var o=db.olimpiadas.find(function(x){return x.id===editId;});
+    document.getElementById('mo-id').value=o.id;
+    document.getElementById('mo-nome').value=o.nome;
+    document.getElementById('mo-sigla').value=o.sigla;
+    document.getElementById('mo-area').value=o.area;
+    document.getElementById('mo-obs').value=o.obs||'';
+    document.getElementById('mo-title').textContent='Editar Olimpiada';
+    pickedColor=o.cor;
+    document.querySelectorAll('.c-dot').forEach(function(d){d.classList.toggle('sel',d.dataset.c===o.cor);});
+  } else {
+    document.getElementById('mo-id').value='';
+    document.getElementById('mo-nome').value='';
+    document.getElementById('mo-sigla').value='';
+    document.getElementById('mo-obs').value='';
+    document.getElementById('mo-area').value='Matematica';
+    document.getElementById('mo-title').textContent='Nova Olimpiada';
+    pickedColor='#c0532a';
+    document.querySelectorAll('.c-dot').forEach(function(d){d.classList.remove('sel');});
+    var first=document.querySelector('.c-dot[data-c="#c0532a"]');if(first)first.classList.add('sel');
+  }
+  openModal('m-olimp');
+}
+
+function salvarOlimp(){
+  var nome=document.getElementById('mo-nome').value.trim();
+  var sigla=document.getElementById('mo-sigla').value.trim().toUpperCase();
+  if(!nome||!sigla){toast('Preencha nome e sigla!','err');return;}
+  var editId=document.getElementById('mo-id').value;
+  var obj={id:editId||uid(),nome:nome,sigla:sigla,area:document.getElementById('mo-area').value,cor:pickedColor,obs:document.getElementById('mo-obs').value.trim()};
+  if(editId){var i=db.olimpiadas.findIndex(function(o){return o.id===editId;});db.olimpiadas[i]=obj;}
+  else db.olimpiadas.push(obj);
+  cloudSave().then(function(){closeModal('m-olimp');toast(editId?'Olimpiada atualizada':'Olimpiada cadastrada');renderDashboard();renderOlimTable();updateChips();}).catch(function(){});
+}
+
+function delOlimp(id){
+  if(!confirm('Excluir esta olimpiada?'))return;
+  db.olimpiadas=db.olimpiadas.filter(function(o){return o.id!==id;});
+  cloudSave().then(function(){renderOlimTable();renderDashboard();updateChips();toast('Removida','err');}).catch(function(){});
+}
+
+function renderOlimTable(){
+  var tbody=document.getElementById('tbody-olimp');
+  if(!db.olimpiadas.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-ico">&#x1F3C5;</div><div class="empty-t">Nenhuma olimpiada</div></div></td></tr>';return;}
+  tbody.innerHTML=db.olimpiadas.map(function(o){
+    var c=db.provas.filter(function(p){return p.olimpId===o.id;}).length;
+    return '<tr><td><div style="width:15px;height:15px;border-radius:50%;background:'+o.cor+'"></div></td>'+
+    '<td><strong>'+o.nome+'</strong>'+(o.obs?'<div style="font-size:11px;color:var(--muted)">'+o.obs+'</div>':'')+'</td>'+
+    '<td><span class="badge bo">'+o.sigla+'</span></td>'+
+    '<td style="color:var(--muted);font-size:12px">'+o.area+'</td>'+
+    '<td style="font-family:\'JetBrains Mono\',monospace;color:var(--accent);font-size:12px;font-weight:600">'+c+'</td>'+
+    '<td style="white-space:nowrap"><button class="btn btn-ghost btn-xs" onclick="openOlimpModal(\''+o.id+'\')">Editar</button> <button class="btn btn-danger btn-xs" onclick="delOlimp(\''+o.id+'\')">Excluir</button></td></tr>';
+  }).join('');
+}
+
+// ── PROVAS ───────────────────────────────────────────────────
+function convertLink(url){
+  if(!url)return url;
+  var gd=url.match(/\/d\/([^/?]+)/);
+  if(gd&&(url.indexOf('drive.google')>=0||url.indexOf('docs.google')>=0))return'https://drive.google.com/file/d/'+gd[1]+'/preview';
+  if(url.indexOf('1drv.ms')>=0||url.indexOf('onedrive.live')>=0)return'https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(url);
+  return url;
+}
+
+function openProvaModal(editId){
+  if(!db.olimpiadas.length){toast('Cadastre uma olimpiada primeiro!','warn');goto('olimpiadas');return;}
+  var sel=document.getElementById('mp-olimp');
+  sel.innerHTML='<option value="">- Selecione -</option>';
+  db.olimpiadas.forEach(function(o){sel.innerHTML+='<option value="'+o.id+'">'+o.sigla+' - '+o.nome+'</option>';});
+  if(editId){
+    var p=db.provas.find(function(x){return x.id===editId;});
+    document.getElementById('mp-id').value=p.id;
+    document.getElementById('mp-olimp').value=p.olimpId;
+    document.getElementById('mp-ano').value=p.ano;
+    document.getElementById('mp-fase').value=p.fase;
+    document.getElementById('mp-link').value=p.link||'';
+    document.getElementById('mp-obs').value=p.obs||'';
+    document.getElementById('mp-title').textContent='Editar Prova';
+  } else {
+    document.getElementById('mp-id').value='';
+    document.getElementById('mp-olimp').value='';
+    document.getElementById('mp-ano').value=new Date().getFullYear();
+    document.getElementById('mp-fase').value='1';
+    document.getElementById('mp-link').value='';
+    document.getElementById('mp-obs').value='';
+    document.getElementById('mp-title').textContent='Cadastrar Prova';
+  }
+  openModal('m-prova');
+}
+
+function salvarProva(){
+  var olimpId=document.getElementById('mp-olimp').value;
+  var ano=parseInt(document.getElementById('mp-ano').value);
+  var fase=parseInt(document.getElementById('mp-fase').value);
+  var link=document.getElementById('mp-link').value.trim();
+  var editId=document.getElementById('mp-id').value;
+  if(!olimpId){toast('Selecione uma olimpiada!','err');return;}
+  if(!ano||ano<1990||ano>2030){toast('Ano invalido!','err');return;}
+  if(!link){toast('Informe o link do PDF!','err');return;}
+  var olimp=db.olimpiadas.find(function(o){return o.id===olimpId;});
+  var base=editId?db.provas.find(function(p){return p.id===editId;}):null;
+  var obj={id:editId||uid(),olimpId:olimpId,olimpNome:olimp.nome,olimpSigla:olimp.sigla,olimpCor:olimp.cor,ano:ano,fase:fase,link:link,viewLink:convertLink(link),obs:document.getElementById('mp-obs').value.trim(),criadoEm:base?base.criadoEm:Date.now()};
+  if(editId){var i=db.provas.findIndex(function(p){return p.id===editId;});db.provas[i]=obj;}
+  else db.provas.push(obj);
+  cloudSave().then(function(){closeModal('m-prova');toast(editId?'Prova atualizada':'Prova cadastrada');renderAcervo();renderProvasAdmin();renderDashboard();updateChips();}).catch(function(){});
+}
+
+function delProva(id){
+  if(!confirm('Excluir esta prova?'))return;
+  db.provas=db.provas.filter(function(p){return p.id!==id;});
+  cloudSave().then(function(){renderProvasAdmin();renderAcervo();renderDashboard();updateChips();toast('Prova removida','err');}).catch(function(){});
+}
+
+function renderProvasAdmin(){
+  var tbody=document.getElementById('tbody-provas');
+  var search=(document.getElementById('fp-search').value||'').toLowerCase();
+  var filtO=document.getElementById('fp-olimp').value||'';
+  var sel=document.getElementById('fp-olimp');
+  var cur=sel.value;sel.innerHTML='<option value="">Todas</option>';
+  db.olimpiadas.forEach(function(o){sel.innerHTML+='<option value="'+o.id+'">'+o.sigla+'</option>';});
+  sel.value=cur;
+  var list=db.provas.filter(function(p){return(p.olimpSigla+' '+p.olimpNome+' '+p.ano).toLowerCase().indexOf(search)>=0&&(!filtO||p.olimpId===filtO);}).sort(function(a,b){return b.criadoEm-a.criadoEm;});
+  if(!list.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-ico">&#x1F4C4;</div><div class="empty-t">Nenhuma prova</div></div></td></tr>';return;}
+  var fb={1:'b1',2:'b2',3:'b3'};
+  tbody.innerHTML=list.map(function(p){return'<tr>'+
+    '<td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+p.olimpCor+';margin-right:6px;vertical-align:middle"></span><strong>'+p.olimpSigla+'</strong><div style="font-size:11px;color:var(--muted)">'+p.olimpNome+'</div></td>'+
+    '<td style="font-family:\'JetBrains Mono\',monospace;color:var(--accent);font-weight:600">'+p.ano+'</td>'+
+    '<td><span class="badge '+fb[p.fase]+'">'+p.fase+'a Fase</span></td>'+
+    '<td style="font-size:12px;color:var(--muted)">'+( p.obs||'-')+'</td>'+
+    '<td><a href="'+p.link+'" target="_blank" class="btn btn-ghost btn-xs" style="text-decoration:none">Abrir</a></td>'+
+    '<td style="white-space:nowrap"><button class="btn btn-ghost btn-xs" onclick="openProvaModal(\''+p.id+'\')">Editar</button> <button class="btn btn-danger btn-xs" onclick="delProva(\''+p.id+'\')">Excluir</button></td></tr>';
+  }).join('');
+}
+
+// ── ACERVO ───────────────────────────────────────────────────
+function renderAcervo(){
+  var search=(document.getElementById('f-search').value||'').toLowerCase();
+  var fO=document.getElementById('f-olimp').value||'';
+  var fF=document.getElementById('f-fase').value||'';
+  var fA=document.getElementById('f-ano').value||'';
+  var selO=document.getElementById('f-olimp');
+  var cO=selO.value;selO.innerHTML='<option value="">Todas as olimpiadas</option>';
+  db.olimpiadas.forEach(function(o){selO.innerHTML+='<option value="'+o.id+'">'+o.sigla+' - '+o.nome+'</option>';});
+  selO.value=cO;
+  var anos=[...new Set(db.provas.map(function(p){return p.ano;}))].sort(function(a,b){return b-a;});
+  var selA=document.getElementById('f-ano');var cA=selA.value;
+  selA.innerHTML='<option value="">Todos os anos</option>';
+  anos.forEach(function(a){selA.innerHTML+='<option value="'+a+'">'+a+'</option>';});
+  selA.value=cA;
+  var list=db.provas.filter(function(p){
+    return (p.olimpSigla+' '+p.olimpNome+' '+p.ano).toLowerCase().indexOf(search)>=0&&
+    (!fO||p.olimpId===fO)&&(!fF||p.fase===parseInt(fF))&&(!fA||p.ano===parseInt(fA));
+  }).sort(function(a,b){return b.ano-a.ano||a.fase-b.fase;});
+  var cnt=list.length;
+  document.getElementById('hero-count').textContent=cnt===0?'Nenhuma prova encontrada':cnt+' prova'+(cnt!==1?'s':'')+' disponive'+(cnt!==1?'is':'l');
+  var grid=document.getElementById('acervo-grid');
+  if(!list.length){grid.innerHTML='<div style="grid-column:1/-1" class="empty"><div class="empty-ico">&#x1F4DA;</div><div class="empty-t">Nenhuma prova encontrada</div><div class="empty-d">Tente outros filtros.</div></div>';return;}
+  var fn={1:'1a Fase',2:'2a Fase',3:'3a Fase'};var fb={1:'b1',2:'b2',3:'b3'};
+  grid.innerHTML=list.map(function(p){return'<div class="prova-card" style="--card-color:'+p.olimpCor+'">'+
+    '<div class="card-olimp-label"><span class="dot" style="background:'+p.olimpCor+'"></span>'+p.olimpNome+'</div>'+
+    '<div class="card-main">'+p.olimpSigla+' &middot; '+p.ano+'<br>'+fn[p.fase]+'</div>'+
+    '<div class="card-badges"><span class="badge '+fb[p.fase]+'">'+fn[p.fase]+'</span><span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border)">'+p.ano+'</span></div>'+
+    (p.obs?'<div class="card-obs">'+p.obs+'</div>':'')+
+    '<div class="card-actions">'+
+    '<a href="'+p.viewLink+'" target="_blank" class="btn btn-ghost btn-sm" style="text-decoration:none;justify-content:center">Visualizar</a>'+
+    '<a href="'+p.link+'" target="_blank" class="btn btn-primary btn-sm" style="text-decoration:none;justify-content:center">Baixar</a>'+
+    '</div></div>';}).join('');
+}
+
+// ── DASHBOARD ────────────────────────────────────────────────
+function renderDashboard(){
+  document.getElementById('s-provas').textContent=db.provas.length;
+  document.getElementById('s-olimp').textContent=db.olimpiadas.length;
+  document.getElementById('s-anos').textContent=new Set(db.provas.map(function(p){return p.ano;})).size;
+  var dt=document.getElementById('dash-olimp');
+  if(!db.olimpiadas.length){dt.innerHTML='<div class="empty"><div class="empty-ico">&#x1F3C5;</div><div class="empty-t">Nenhuma olimpiada cadastrada</div></div>';}
+  else{dt.innerHTML='<table><thead><tr><th>Cor</th><th>Olimpiada</th><th>Sigla</th><th>Area</th><th>Provas</th></tr></thead><tbody>'+db.olimpiadas.map(function(o){var c=db.provas.filter(function(p){return p.olimpId===o.id;}).length;return'<tr><td><div style="width:13px;height:13px;border-radius:50%;background:'+o.cor+'"></div></td><td><strong>'+o.nome+'</strong></td><td><span class="badge bo">'+o.sigla+'</span></td><td style="color:var(--muted);font-size:12px">'+o.area+'</td><td style="font-family:\'JetBrains Mono\',monospace;color:var(--accent);font-size:12px;font-weight:600">'+c+'</td></tr>';}).join('')+'</tbody></table>';}
+  var recent=db.provas.slice().sort(function(a,b){return b.criadoEm-a.criadoEm;}).slice(0,5);
+  var dr=document.getElementById('dash-recent');
+  if(!recent.length){dr.innerHTML='<div class="empty"><div class="empty-ico">&#x1F4C4;</div><div class="empty-t">Nenhuma prova ainda</div></div>';}
+  else{var fb={1:'b1',2:'b2',3:'b3'};dr.innerHTML='<table><thead><tr><th>Olimpiada</th><th>Ano</th><th>Fase</th><th>Link</th></tr></thead><tbody>'+recent.map(function(p){return'<tr><td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+p.olimpCor+';margin-right:6px;vertical-align:middle"></span><strong>'+p.olimpSigla+'</strong></td><td style="font-family:\'JetBrains Mono\',monospace;color:var(--accent);font-weight:600">'+p.ano+'</td><td><span class="badge '+fb[p.fase]+'">'+p.fase+'a Fase</span></td><td><a href="'+p.viewLink+'" target="_blank" class="btn btn-ghost btn-xs" style="text-decoration:none">Ver</a></td></tr>';}).join('')+'</tbody></table>';}
+}
+
+// ── CONFIG ───────────────────────────────────────────────────
+function loadConfig(){
+  if(cfg.provider==='sheets'){
+    document.getElementById('cfg-cloud-label').textContent='URL Google Apps Script';
+    document.getElementById('cfg-cloud-sub').textContent='URL do Web App para salvar os dados.';
+    document.getElementById('cfg-cloud').value=cfg.sheetsUrl||'';
+  } else {
+    document.getElementById('cfg-cloud-label').textContent='API Key JSONBin';
+    document.getElementById('cfg-cloud-sub').textContent='Chave usada para salvar os dados na nuvem.';
+    document.getElementById('cfg-cloud').value=cfg.apiKey||'';
+  }
+  document.getElementById('cfg-nome').value=cfg.nome||'';
+  document.getElementById('cfg-pass').value='';document.getElementById('cfg-pass2').value='';
+}
+
+function saveConfig(what){
+  if(what==='cloud'){var v=document.getElementById('cfg-cloud').value.trim();if(!v){toast('Campo vazio','err');return;}if(cfg.provider==='sheets')cfg.sheetsUrl=v;else cfg.apiKey=v;}
+  if(what==='pass'){var p=document.getElementById('cfg-pass').value,p2=document.getElementById('cfg-pass2').value;if(!p){toast('Informe a senha','err');return;}if(p!==p2){toast('Senhas nao coincidem','err');return;}cfg.passHash=hashPass(p);}
+  if(what==='nome'){var n=document.getElementById('cfg-nome').value.trim();if(n){cfg.nome=n;applyNome();}}
+  saveCfg();toast('Salvo!');
+}
+
+function resetAll(){if(!confirm('Apagar configuracoes locais?'))return;localStorage.removeItem(CFG_KEY);location.reload();}
+
+// ── UTILS ────────────────────────────────────────────────────
+function updateChips(){document.getElementById('chip-acervo').textContent=db.provas.length;}
+function showLoading(m){document.getElementById('loading-text').textContent=m||'Aguarde...';document.getElementById('loading').classList.add('show');}
+function hideLoading(){document.getElementById('loading').classList.remove('show');}
+function toast(msg,type){
+  var w=document.getElementById('toasts'),t=document.createElement('div');
+  t.className='toast'+(type==='err'?' err':type==='warn'?' warn':'');
+  t.textContent=(type==='err'?'⚠️ ':type==='warn'?'💡 ':'✅ ')+msg;
+  w.appendChild(t);setTimeout(function(){t.remove();},3800);
+}
+
+// ── BOOT ─────────────────────────────────────────────────────
+loadCfg();
+if((cfg.apiKey||cfg.sheetsUrl)&&cfg.passHash){startApp();}
+</script>
+</body>
+</html>
