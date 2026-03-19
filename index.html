@@ -1025,7 +1025,7 @@ function gerarHtmlPublico(){
     else { pubCfg.apiKey = cfg.apiKey; pubCfg.binId = cfg.binId; }
     pubCfg.nome = cfg.nome || 'Acervo Olimpico';
     var newHtml = html.replace(
-      'var PUBLIC_CFG = null;',
+      'var PUBLIC_CFG = {"provider":"sheets","sheetsUrl":"https://script.google.com/macros/s/AKfycbyypvXeOyn1okAa2oQe0BtJGzbOCQUnR_YuEdZzapiLjGyXYREvJWf39rhOIXhNJxB9OA/exec","nome":"Acervo de Olimpíadas - Prof. João Leonardo Muniz"};',
       'var PUBLIC_CFG = '+JSON.stringify(pubCfg)+';'
     );
     var blob = new Blob([newHtml], {type:'text/html'});
