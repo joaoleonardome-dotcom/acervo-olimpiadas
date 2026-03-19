@@ -483,6 +483,12 @@ function out(s){
         <div class="fg" style="margin-top:14px"><label class="fl">Nome</label><input class="fi" id="cfg-nome" placeholder="Ex: Acervo Prof. Joao"></div>
         <button class="btn btn-admin btn-sm" onclick="saveConfig('nome')">Salvar nome</button>
       </div>
+      <div class="config-section" style="border-color:rgba(42,122,74,.25)">
+        <div class="config-title" style="color:var(--green)">Gerar HTML para professores</div>
+        <div class="config-sub">Gera uma versao do arquivo com as configuracoes ja embutidas. Os professores abrem direto no acervo, sem ver tela de setup. Faca o upload deste arquivo no GitHub no lugar do anterior.</div>
+        <button class="btn btn-admin btn-sm" onclick="gerarHtmlPublico()">&#x2B07; Baixar HTML para professores</button>
+        <div id="gerar-result" style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
+      </div>
       <div class="config-section" style="border-color:rgba(184,48,48,.25)">
         <div class="config-title" style="color:var(--danger)">Zona de perigo</div>
         <div class="config-sub">Remove as configuracoes locais. Os dados na nuvem permanecem.</div>
@@ -1007,6 +1013,31 @@ function saveConfig(what){
 
 function resetAll(){if(!confirm('Apagar configuracoes locais?'))return;localStorage.removeItem(CFG_KEY);location.reload();}
 
+// ── GERAR HTML PUBLICO ───────────────────────────────────────
+function gerarHtmlPublico(){
+  var el = document.getElementById('gerar-result');
+  el.textContent = 'Gerando...';
+  fetch(window.location.href)
+  .then(function(r){return r.text();})
+  .then(function(html){
+    var pubCfg = {provider: cfg.provider};
+    if(cfg.provider==='sheets') pubCfg.sheetsUrl = cfg.sheetsUrl;
+    else { pubCfg.apiKey = cfg.apiKey; pubCfg.binId = cfg.binId; }
+    pubCfg.nome = cfg.nome || 'Acervo Olimpico';
+    var newHtml = html.replace(
+      'var PUBLIC_CFG = null;',
+      'var PUBLIC_CFG = '+JSON.stringify(pubCfg)+';'
+    );
+    var blob = new Blob([newHtml], {type:'text/html'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'index.html';
+    a.click();
+    el.textContent = 'Arquivo baixado! Faca o upload no GitHub substituindo o index.html atual.';
+  })
+  .catch(function(e){el.textContent = 'Erro: '+e.message;});
+}
+
 // ── UTILS ────────────────────────────────────────────────────
 function updateChips(){document.getElementById('chip-acervo').textContent=db.provas.length;}
 function showLoading(m){document.getElementById('loading-text').textContent=m||'Aguarde...';document.getElementById('loading').classList.add('show');}
@@ -1019,8 +1050,29 @@ function toast(msg,type){
 }
 
 // ── BOOT ─────────────────────────────────────────────────────
+// Config publica embutida no HTML (preenchida pelo admin via configuracoes)
+var PUBLIC_CFG = null; // sera substituido pelo admin: {provider,sheetsUrl ou apiKey+binId}
+
 loadCfg();
-if((cfg.apiKey||cfg.sheetsUrl)&&cfg.passHash){startApp();}
+if((cfg.apiKey||cfg.sheetsUrl)&&cfg.passHash){
+  // Admin configurado neste navegador
+  startApp();
+} else if(PUBLIC_CFG){
+  // Professores: usa config publica embutida, sem setup
+  cfg = PUBLIC_CFG;
+  startAppViewer();
+} else {
+  // Nenhuma config: mostra setup
+  document.getElementById('setup-screen').style.display='flex';
+}
+
+function startAppViewer(){
+  // Modo somente leitura para professores
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  applyNome();
+  cloudLoad().then(function(){renderAcervo();updateChips();});
+}
 </script>
 </body>
 </html>
